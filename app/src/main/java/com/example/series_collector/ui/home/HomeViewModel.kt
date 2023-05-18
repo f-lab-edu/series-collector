@@ -6,7 +6,7 @@ import com.example.series_collector.data.Category
 import com.example.series_collector.data.Series
 import com.example.series_collector.data.repository.CategoryRepository
 import com.example.series_collector.data.repository.SeriesRepository
-import com.example.series_collector.utils.workers.SeriesWork
+import com.example.series_collector.utils.workers.SeriesWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val seriesRepository: SeriesRepository,
     private val categoryRepository: CategoryRepository,
-    private val seriesWork: SeriesWork,
+    private val seriesWorker: SeriesWorker,
 ) : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>()
@@ -42,7 +42,7 @@ class HomeViewModel @Inject constructor(
     fun updateSeries(){
         viewModelScope.launch(updateExceptionHandler) {
             _isLoading.value = true
-            seriesWork.updateSeriesStream()
+            seriesWorker.updateStream()
                 .collect { workInfo ->
                     if (workInfo.state == WorkInfo.State.SUCCEEDED
                         || workInfo.state == WorkInfo.State.FAILED

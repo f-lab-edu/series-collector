@@ -7,8 +7,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.*
 import com.example.series_collector.data.Category
 import com.example.series_collector.databinding.ListItemCategoryBinding
-import com.example.series_collector.utils.CATEGORY_FICTION
-import com.example.series_collector.utils.CATEGORY_TRAVEL
 
 
 class CategoryAdapter : ListAdapter<Category, RecyclerView.ViewHolder>(CategoryDiffCallback()) {
