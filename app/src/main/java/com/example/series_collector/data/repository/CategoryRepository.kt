@@ -4,6 +4,10 @@ import com.example.series_collector.data.Series
 import com.example.series_collector.data.SeriesFetcher
 import com.example.series_collector.data.room.SeriesDao
 import com.example.series_collector.data.source.FirestoreDataSource
+import com.example.series_collector.utils.CATEGORY_FICTION
+import com.example.series_collector.utils.CATEGORY_POPULAR
+import com.example.series_collector.utils.CATEGORY_RECENT
+import com.example.series_collector.utils.CATEGORY_TRAVEL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,34 +23,29 @@ class CategoryRepository @Inject constructor(
     }
 
     suspend fun getSeriesByCategory(categoryId: Int): List<Series> = withContext(Dispatchers.IO) {
-        val series = CategoryType.valueOf(categoryId.toString())
-        val list = series.getSeriesList(seriesDao)
-        fetchSeriesThumbnail(list)
+        val series = when (categoryId) {
+            CATEGORY_RECENT -> {
+                seriesDao.getRecentSeries()
+            }
+            CATEGORY_POPULAR -> {
+                seriesDao.getPopularSeries()
+            }
+            CATEGORY_FICTION -> {
+                seriesDao.getFictionSeries()
+            }
+            CATEGORY_TRAVEL -> {
+                seriesDao.getTravelSeries()
+            }
+            else -> {
+                seriesDao.getRecentSeries()
+            }
+        }
+
+        fetchSeriesThumbnail(series)
     }
 
     private suspend fun fetchSeriesThumbnail(list: List<Series>): List<Series> =
         seriesFetcher.fetchSeriesThumbnail(list)
-}
 
-enum class CategoryType(
-    val label: String
-) {
-    RECENT(label = "1") {
-        override suspend fun getSeriesList(seriesDao: SeriesDao) =
-            seriesDao.getRecentSeries()
-    },
-    POPULAR(label = "2") {
-        override suspend fun getSeriesList(seriesDao: SeriesDao) =
-            seriesDao.getPopularSeries()
-    },
-    FICTION(label = "3") {
-        override suspend fun getSeriesList(seriesDao: SeriesDao) =
-            seriesDao.getFictionSeries()
-    },
-    TRAVEL(label = "4") {
-        override suspend fun getSeriesList(seriesDao: SeriesDao) =
-            seriesDao.getTravelSeries()
-    };
 
-    abstract suspend fun getSeriesList(seriesDao: SeriesDao): List<Series>
 }
